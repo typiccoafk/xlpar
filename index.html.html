@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080b09">
+  <title>XLPAR — магазин</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{--bg:#080b09;--panel:#111713;--panel2:#172019;--green:#a6ff4d;--green2:#6dcc27;--text:#f3f7f1;--muted:#9aa69a;--line:#29352b;--danger:#ff6868}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}
+    .wrap{max-width:1120px;margin:auto;padding:22px 18px 60px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 26px}
+    .brand{font-size:25px;font-weight:900;letter-spacing:.16em}.brand span{color:var(--green)}
+    .header-actions{display:flex;gap:9px;align-items:center}
+    .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:11px 15px;border-radius:12px;font-weight:700}
+    .btn.primary{background:var(--green);border-color:var(--green);color:#10170b}
+    .btn.ghost{background:transparent}.btn.danger{color:var(--danger);border-color:#633535}
+    .hero{padding:34px 28px;border:1px solid var(--line);border-radius:22px;background:radial-gradient(ellipse at 85% 15%,#29451b 0,transparent 42%),linear-gradient(130deg,#121a13,#090d0a);margin-bottom:28px}
+    .eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+    h1{font-size:clamp(32px,6vw,54px);line-height:1.03;margin:12px 0;max-width:650px}
+    .hero p{color:var(--muted);max-width:520px;margin:0}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px 0 16px;flex-wrap:wrap}
+    .filters{display:flex;gap:8px;flex-wrap:wrap}
+    .filter{padding:9px 13px;border-radius:999px;background:transparent;border:1px solid var(--line);color:var(--muted)}
+    .filter.active{background:var(--green);border-color:var(--green);color:#10170b;font-weight:800}
+    .search{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px 13px;min-width:min(100%,230px);outline:none}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:17px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+    .photo{aspect-ratio:4/3;background:#1a241b;display:grid;place-items:center;overflow:hidden}
+    .photo img{width:100%;height:100%;object-fit:cover}.placeholder{color:#6c806c;font-size:12px;letter-spacing:.12em}
+    .card-body{padding:15px;display:flex;flex-direction:column;gap:9px;flex:1}
+    .tag{font-size:11px;color:var(--green);text-transform:uppercase;letter-spacing:.1em}
+    .card h3{margin:0;font-size:17px}.desc{margin:0;color:var(--muted);font-size:13px;min-height:38px}
+    .bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:8px}
+    .price{font-size:18px;font-weight:850}.manager{background:var(--green);color:#10170b;border:0;border-radius:10px;padding:10px 12px;font-weight:850}
+    .admin-tools{display:flex;gap:7px}.admin-tools button{font-size:12px;padding:7px 9px}
+    .empty{padding:45px 15px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;grid-column:1/-1}
+    .admin-panel{display:none;margin:22px 0;padding:18px;border:1px solid #496a32;background:#101810;border-radius:17px}
+    .admin-panel.open{display:block}.admin-panel h2{margin:0 0 14px;font-size:20px}
+    .formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
+    label{font-size:12px;color:var(--muted)}
+    input,textarea,select{width:100%;background:#080d09;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px;outline:none}
+    textarea{min-height:75px;resize:vertical}
+    .admin-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+    .cat-add{display:flex;gap:8px;margin-top:12px;max-width:520px}.cat-add input{flex:1}
+    footer{border-top:1px solid var(--line);margin-top:40px;padding-top:18px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .hidden{display:none!important}
+    @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:15px 12px 40px}.hero{padding:27px 20px}}
+    @media(max-width:480px){.grid{grid-template-columns:1fr 1fr;gap:10px}.card-body{padding:11px}.card h3{font-size:14px}.desc{font-size:12px;min-height:48px}.bottom{align-items:flex-start;flex-direction:column}.manager{width:100%}.brand{font-size:21px}.btn{padding:10px 11px;font-size:13px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero p{font-size:14px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">XLPAR<span>.</span></div>
+    <div class="header-actions">
+      <button class="btn ghost" id="adminBtn">Вход для админа</button>
+      <a class="btn primary" id="contactTop" href="https://t.me/typicco" target="_blank" rel="noopener">Менеджер ↗</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">XLPAR • STORE</div>
+    <h1>Твой выбор.<br><span style="color:var(--green)">Твой XLPAR.</span></h1>
+    <p>Выбирай товары в каталоге. По наличию и оформлению заказа напиши нашему менеджеру.</p>
+  </section>
+
+  <section class="admin-panel" id="adminPanel">
+    <h2>Панель администратора</h2>
+    <form id="productForm">
+      <div class="formgrid">
+        <div class="field"><label for="pName">Название товара</label><input id="pName" required placeholder="Например, Крем для лица"></div>
+        <div class="field"><label for="pPrice">Цена (₸)</label><input id="pPrice" required type="number" min="0" placeholder="4500"></div>
+        <div class="field"><label for="pCategory">Категория</label><select id="pCategory"></select></div>
+        <div class="field"><label for="pImage">Ссылка на фото</label><input id="pImage" type="url" placeholder="https://..."></div>
+        <div class="field full"><label for="pDesc">Описание</label><textarea id="pDesc" placeholder="Короткое описание товара"></textarea></div>
+      </div>
+      <div class="admin-row">
+        <button class="btn primary" type="submit" id="saveProduct">Добавить товар</button>
+        <button class="btn" type="button" id="cancelEdit">Очистить</button>
+      </div>
+    </form>
+    <div class="cat-add">
+      <input id="newCategory" placeholder="Новая категория">
+      <button class="btn" id="addCategory" type="button">Добавить категорию</button>
+    </div>
+    <p style="color:var(--muted);font-size:12px;margin-bottom:0">Изменения в этой демоверсии сохраняются в браузере на текущем устройстве.</p>
+  </section>
+
+  <div class="toolbar">
+    <div class="filters" id="filters"></div>
+    <input class="search" id="search" placeholder="Поиск по каталогу…">
+  </div>
+  <main class="grid" id="catalog"></main>
+  <footer><span>XLPAR. — store</span><span>Вопросы по заказу: @typicco</span></footer>
+</div>
+
+<script>
+(() => {
+  const ADMIN_PIN = "4826"; // Замените PIN. Это демо-защита, не безопасная авторизация.
+  const MANAGER_URL = "https://t.me/typicco";
+  const defaultCategories = ["Все", "Уход за лицом", "Макияж", "Волосы", "Тело"];
+  const starterProducts = [
+    {id:1,name:"Увлажняющий крем",price:4500,category:"Уход за лицом",description:"Ежедневный уход и комфортное увлажнение.",image:""},
+    {id:2,name:"Блеск для губ",price:3200,category:"Макияж",description:"Лёгкий блеск для повседневного макияжа.",image:""}
+  ];
+  let categories = JSON.parse(localStorage.getItem("xlpar_categories") || "null") || defaultCategories;
+  let products = JSON.parse(localStorage.getItem("xlpar_products") || "null") || starterProducts;
+  let isAdmin = false, editingId = null, activeCategory = "Все";
+  const $ = id => document.getElementById(id);
+  const save = () => {
+    localStorage.setItem("xlpar_categories", JSON.stringify(categories));
+    localStorage.setItem("xlpar_products", JSON.stringify(products));
+  };
+  const money = n => new Intl.NumberFormat("ru-RU").format(Number(n)||0) + " ₸";
+
+  function renderCategories(){
+    $("filters").innerHTML = "";
+    categories.forEach(cat => {
+      const b = document.createElement("button");
+      b.className = "filter" + (activeCategory===cat ? " active":"");
+      b.textContent = cat;
+      b.onclick = () => { activeCategory=cat; render(); };
+      $("filters").appendChild(b);
+    });
+    $("pCategory").innerHTML = categories.filter(c=>c!=="Все").map(c=>`<option>${escapeHtml(c)}</option>`).join("");
+  }
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function render(){
+    renderCategories();
+    const q = $("search").value.trim().toLowerCase();
+    const shown = products.filter(p=>(activeCategory==="Все"||p.category===activeCategory) && (p.name+" "+p.description).toLowerCase().includes(q));
+    const root=$("catalog"); root.innerHTML="";
+    if(!shown.length){root.innerHTML='<div class="empty">Пока здесь нет товаров.</div>';return;}
+    shown.forEach(p=>{
+      const card=document.createElement("article"); card.className="card";
+      const photo=p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.remove()">` : '<span class="placeholder">XLPAR / PRODUCT</span>';
+      card.innerHTML=`<div class="photo">${photo}</div><div class="card-body">
+        <div class="tag">${escapeHtml(p.category)}</div><h3>${escapeHtml(p.name)}</h3>
+        <p class="desc">${escapeHtml(p.description||"")}</p>
+        <div class="bottom"><span class="price">${money(p.price)}</span><button class="manager">Менеджер ↗</button></div>
+        ${isAdmin?`<div class="admin-tools"><button class="btn" data-edit="${p.id}">Изменить</button><button class="btn danger" data-delete="${p.id}">Удалить</button></div>`:""}
+      </div>`;
+      card.querySelector(".manager").onclick=()=>window.open(MANAGER_URL,"_blank","noopener");
+      const edit=card.querySelector("[data-edit]"); if(edit) edit.onclick=()=>editProduct(p.id);
+      const del=card.querySelector("[data-delete]"); if(del) del.onclick=()=>deleteProduct(p.id);
+      root.appendChild(card);
+    });
+  }
+  function resetForm(){editingId=null;$("productForm").reset();$("saveProduct").textContent="Добавить товар";}
+  function editProduct(id){
+    const p=products.find(x=>x.id===id); if(!p)return;
+    editingId=id;$("pName").value=p.name;$("pPrice").value=p.price;$("pCategory").value=p.category;$("pImage").value=p.image||"";$("pDesc").value=p.description||"";
+    $("saveProduct").textContent="Сохранить изменения";$("adminPanel").scrollIntoView({behavior:"smooth"});
+  }
+  function deleteProduct(id){
+    if(!confirm("Удалить этот товар?"))return;
+    products=products.filter(p=>p.id!==id);save();render();
+  }
+  $("adminBtn").onclick=()=>{
+    if(isAdmin){isAdmin=false;$("adminPanel").classList.remove("open");$("adminBtn").textContent="Вход для админа";render();return;}
+    const pin=prompt("Введите PIN администратора:");
+    if(pin===ADMIN_PIN){isAdmin=true;$("adminPanel").classList.add("open");$("adminBtn").textContent="Выйти из админки";render();}
+    else if(pin!==null) alert("Неверный PIN.");
+  };
+  $("productForm").onsubmit=e=>{
+    e.preventDefault();
+    const item={id:editingId||Date.now(),name:$("pName").value.trim(),price:Number($("pPrice").value),category:$("pCategory").value,description:$("pDesc").value.trim(),image:$("pImage").value.trim()};
+    if(editingId)products=products.map(p=>p.id===editingId?item:p);else products.unshift(item);
+    save();resetForm();render();
+  };
+  $("cancelEdit").onclick=resetForm;
+  $("addCategory").onclick=()=>{
+    const name=$("newCategory").value.trim();
+    if(!name)return;
+    if(categories.includes(name)){alert("Такая категория уже есть.");return;}
+    categories.push(name);$("newCategory").value="";save();render();
+  };
+  $("search").oninput=render;
+  $("contactTop").href=MANAGER_URL;
+  if(window.Telegram?.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}
+  render();
+})();
+</script>
+</body>
+</html>
